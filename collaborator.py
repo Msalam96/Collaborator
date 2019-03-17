@@ -52,7 +52,7 @@ x = 0
 while True:
     key = input(""" 
 Press 1 to add a user to our database.
-Press 2 to print users
+Press 2 to find information about a specific user. 
 Press 0 to exit \n-> """)
     if key == '1':
         first = input("What is your first name?\n-> ")
@@ -73,9 +73,14 @@ Press 0 to exit \n-> """)
         x += 1
     elif key == '2':
         cur = conn.cursor()
-        cur.execute("SELECT * FROM organization")
-        rows = cur.fetchall()
-        print(rows)
+        first, last = input("Enter the first and last name of the user.\n-> ").split()
+        cur.execute("SELECT * FROM user WHERE first=%s AND last=%s", (first, last))
+        userset = (cur.fetchone())
+        print('The users first name is: ', userset[1])
+        print('The users last name is: ', userset[2])
+        print('The users phone number is: ', userset[3])
+        print('The users address is: ', userset[4])
+        print('The user has a degree in: ', userset[5])
     elif key == '0':
         print("Thank you for using our software")
         break
