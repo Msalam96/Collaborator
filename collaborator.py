@@ -47,12 +47,11 @@ c.execute("""CREATE TABLE IF NOT EXISTS skill (
 print("Welcome to the Collaborator Software. Here are the following inputs:")
 
 
-x = c.execute("SELECT MAX(user_id) FROM user")
-print(x)
+x = 0
 
 while True:
     key = input(""" 
-Press 1 if you wish to add a user to our database.
+Press 1 to add a user to our database.
 Press 2 to print users
 Press 0 to exit \n-> """)
     if key == '1':
@@ -61,12 +60,20 @@ Press 0 to exit \n-> """)
         phone = input("What is your phone number?\n-> ")
         address = input("What is your address?\n-> ")
         degree = input("What degree did you earn?\n-> ")
-        c.execute("INSERT INTO user VALUES (%s,%s,%s, %s, %s, %s)", (x, first, last, phone, address, degree))
+        org = input("What organization do you work at?\n-> ")
+        orgtype = input("What type of organization is this?\n-> ")
+        interest = input("List an interest you have:\n-> ")
+        intlevel = input("On a scale from 1-10 how interested are you in this?\n-> ")
+        skill = input("List a skill that you possess:\n-> ")
+        skilevel = input("On a scale from 1-10 how skilled are you at this?\n-> ")
+        c.execute("INSERT INTO user VALUES (%s,%s,%s,%s,%s,%s)", (x, first, last, phone, address, degree))
+        c.execute("INSERT INTO organization VALUES (%s,%s,%s)", (x, org, orgtype))
+        c.execute("INSERT INTO interest VALUES (%s,%s,%s)", (x, interest, intlevel))
+        c.execute("INSERT INTO skill VALUES (%s,%s,%s)", (x, skill, skilevel))
         x += 1
-        conn.commit()
     elif key == '2':
         cur = conn.cursor()
-        cur.execute("SELECT * FROM user")
+        cur.execute("SELECT * FROM organization")
         rows = cur.fetchall()
         print(rows)
     elif key == '0':
