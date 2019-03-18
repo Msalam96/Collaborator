@@ -44,6 +44,23 @@ c.execute("""CREATE TABLE IF NOT EXISTS skill (
         skill_level integer
         )""")
 
+def simInterests (userId):
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM interest WHERE user_id=%s", (userId,))
+        sInterest = (cursor.fetchone())
+        print(sInterest)
+        cursor.execute("SELECT * FROM interest WHERE interest = %s", (sInterest[0],))
+        intInfo = (cursor.fetchall())
+        print(intInfo)
+        for data in cursor:
+                print("\nWe in the for loop at iteration #", x)
+                cursor.execute("SELECT * FROM user WHERE user_id = %s", (intInfo[0],))
+                print("\nFirst SQL in for loop")
+                perInfo = (cursor.fetchone())
+                cursor.execute("SELECT org_name FROM organization WHERE user_id = %s", perInfo[0],)
+                compInfo = (cursor.fetchone())
+                print('%s %s who works at %s has %s in common with you', (perInfo[1], perInfo[2], compInfo, sInterest[0]))
+
 print("Welcome to the Collaborator Software. Here are the following inputs:")
 
 
