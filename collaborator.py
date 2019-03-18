@@ -7,7 +7,7 @@ c = conn.cursor(buffered=True)
 c.execute("CREATE DATABASE IF NOT EXISTS collaboratordb")
 
 c.execute("""CREATE TABLE IF NOT EXISTS user (
-        user_id int AUTO_INCREMENT PRIMARY KEY,
+        user_id integer AUTO_INCREMENT PRIMARY KEY,
         first text,
         last text,
         phone text,
@@ -16,7 +16,7 @@ c.execute("""CREATE TABLE IF NOT EXISTS user (
         )""")
 
 c.execute("""CREATE TABLE IF NOT EXISTS interest (
-        user_id int PRIMARY KEY,
+        user_id integer PRIMARY KEY,
         interest text,
         interest_level integer
         )""")
