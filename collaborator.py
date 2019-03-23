@@ -142,7 +142,7 @@ Press 0 to exit \n-> """)
                 for row2 in rows2:
                     ids.append(row2[0])
                 query3 = "SELECT * FROM user WHERE user_id=%s"
-                print("-> Here is a list of trusted colleague(s) for project:", row[4], ":")
+                print("-> Here is a list of trusted colleague(s) for project ", row[4], ":")
                 for x in range(len(ids)):
                     cur.execute(query3, (ids[x],))
                     rows3 = cur.fetchall()
