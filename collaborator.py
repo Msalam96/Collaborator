@@ -16,12 +16,6 @@ c.execute("""CREATE TABLE IF NOT EXISTS user (
         # degree text 
         )""")
 
-# c.execute("""CREATE TABLE IF NOT EXISTS interest (
-#         user_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-#         interest text,
-#         interest_level integer
-#         )""")
-
 c.execute("""CREATE TABLE IF NOT EXISTS interest (
         user_id text,
         interest text,
@@ -35,7 +29,7 @@ c.execute("""CREATE TABLE IF NOT EXISTS distance (
         )""")
 
 c.execute("""CREATE TABLE IF NOT EXISTS organization (
-        user_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        user_id text,
         org_name text,
         org_type text
         )""")
@@ -46,7 +40,7 @@ c.execute("""CREATE TABLE IF NOT EXISTS project (
         )""")
 
 c.execute("""CREATE TABLE IF NOT EXISTS skill (
-        user_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        user_id text,
         skill_name text,
         skill_level integer
         )""")
@@ -63,11 +57,34 @@ def simInterests():
             c.execute("SELECT * FROM interest WHERE interest = %s", (sInterest[1],))
             intInfo = (c.fetchall())
             for data in intInfo:
+                if userInfo[0] == data[0]:
+                    continue
                 c.execute("SELECT * FROM user WHERE user_id = %s", (data[0],))
                 perInfo = (c.fetchone())
                 c.execute("SELECT org_name FROM organization WHERE user_id = %s", (perInfo[0],))
                 compInfo = c.fetchone()
                 print(perInfo[1], perInfo[2], "who works at", compInfo[0], "has", sInterest[1], "in common with you.")
+    else:
+        print("-> Sorry, this user does not exist.")
+
+def simSkills():
+    first, last = input("Enter the first and last name of the user.\n-> ").split()
+    if userexists(first, last):
+        c.execute("SELECT * FROM user WHERE first=%s AND last=%s", (first, last))
+        userInfo = c.fetchone()
+        c.execute("SELECT * FROM skill WHERE user_id = %s", (userInfo[0],))
+        commSkills = (c.fetchall())
+        for eachSkill in commSkills:
+            c.execute("SELECT * FROM skill WHERE skill = %s", (eachSkill[1],))
+            intInfo = (c.fetchall())
+            for data in intInfo:
+                if userInfo[0] == data[0]:
+                    continue
+                c.execute("SELECT * FROM user WHERE user_id = %s", (data[0],))
+                perInfo = (c.fetchone())
+                c.execute("SELECT org_name FROM organization WHERE user_id = %s", (perInfo[0],))
+                compInfo = c.fetchone()
+                print(perInfo[1], perInfo[2], "who works at", compInfo[0], "is also good at", eachSkill[1])
     else:
         print("-> Sorry, this user does not exist.")
 
@@ -82,11 +99,13 @@ user_data = csv.reader(open('user.csv'))
 project_data = csv.reader(open('project.csv'))
 interest_data = csv.reader(open('interest.csv'))
 org_data = csv.reader(open('organization.csv'))
+skill_data = csv.reader(open('skill.csv'))
 
 firstline = True
 firstline2 = True
 firstline3 = True
 firstline4 = True
+firstline5 = True
 
 for row in user_data:
     if firstline:
@@ -124,6 +143,14 @@ for row in org_data:
         continue
     else:
         c.execute('INSERT INTO organization(user_id, org_name, org_type) VALUES(%s, %s, %s)', row)
+        print(row)
+
+for row in skill_data:
+    if firstline5:
+        firstline5 = False
+        continue
+    else:
+        c.execute('INSERT INTO skill(user_id, skill_name, skill_level) VALUES(%s, %s, %s)', row)
         print(row)
 
 print("Welcome to the Collaborator Software. The CSV files have been read! Here are the following inputs:")
@@ -185,6 +212,8 @@ Press 0 to exit \n-> """)
         break
     elif key == '3':
         simInterests()
+    elif key == '4':
+        simSkills()
     else:
         print("This input was not recognized.")
 
