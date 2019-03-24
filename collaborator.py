@@ -45,53 +45,80 @@ c.execute("""CREATE TABLE IF NOT EXISTS skill (
         skill_level integer
         )""")
 
-def simInterests():
-    first, last = input("Enter the first and last name of the user.\n-> ").split()
-    if userexists(first, last):
-        c.execute("SELECT * FROM user WHERE first=%s AND last=%s", (first, last))
-        userInfo = c.fetchone()
-        c.execute("SELECT * FROM interest WHERE user_id = %s", (userInfo[0],))
-        commInterests = (c.fetchall())
-        for sInterest in commInterests:
-            c.execute("SELECT * FROM interest WHERE interest = %s", (sInterest[1],))
-            intInfo = (c.fetchall())
-            for data in intInfo:
-                if userInfo[0] == data[0]:
-                    continue
-                c.execute("SELECT * FROM user WHERE user_id = %s", (data[0],))
-                perInfo = (c.fetchone())
-                c.execute("SELECT org_name FROM organization WHERE user_id = %s", (perInfo[0],))
-                compInfo = c.fetchone()
-                print(perInfo[1], perInfo[2], "who works at", compInfo[0], "has", sInterest[1], "in common with you.")
-    else:
-        print("-> Sorry, this user does not exist.")
-
-def simSkills():
-    first, last = input("Enter the first and last name of the user.\n-> ").split()
-    if userexists(first, last):
-        c.execute("SELECT * FROM user WHERE first=%s AND last=%s", (first, last))
-        userInfo = c.fetchone()
-        c.execute("SELECT * FROM skill WHERE user_id = %s", (userInfo[0],))
-        commSkills = (c.fetchall())
-        for eachSkill in commSkills:
-            c.execute("SELECT * FROM skill WHERE skill_name = %s", (eachSkill[1],))
-            intInfo = (c.fetchall())
-            for data in intInfo:
-                if userInfo[0] == data[0]:
-                    continue
-                c.execute("SELECT * FROM user WHERE user_id = %s", (data[0],))
-                perInfo = (c.fetchone())
-                c.execute("SELECT org_name FROM organization WHERE user_id = %s", (perInfo[0],))
-                compInfo = c.fetchone()
-                print(perInfo[1], perInfo[2], "who works at", compInfo[0], "is also good at", eachSkill[1])
-    else:
-        print("-> Sorry, this user does not exist.")
-
 def userexists(f, l):
-
     c.execute("SELECT * FROM user WHERE first=%s AND last=%s", (f, l))
     row = c.rowcount
     return row == 1
+
+def custom_sort(t):
+    return t[4]
+
+def sim_interests():
+    data_interest = []
+    first, last = input("Enter the first and last name of the user.\n-> ").split()
+    if userexists(first, last):
+        c.execute("SELECT * FROM user WHERE first=%s AND last=%s", (first, last))
+        user_info = c.fetchone()
+        c.execute("SELECT * FROM interest WHERE user_id = %s", (user_info[0],))
+        comm_interests = (c.fetchall())
+        for s_interest in comm_interests:
+            c.execute("SELECT * FROM interest WHERE interest = %s", (s_interest[1],))
+            int_info = (c.fetchall())
+            for data in int_info:
+                if user_info[0] == data[0]:
+                    continue
+                c.execute("SELECT * FROM user WHERE user_id = %s", (data[0],))
+                per_info = (c.fetchone())
+                c.execute("SELECT org_name FROM organization WHERE user_id = %s", (per_info[0],))
+                comp_info = c.fetchone()
+                data_interest.append([per_info[1], per_info[2], comp_info[0], s_interest[1], data[2]])
+            print("Here is a list of other users who share an interest in", s_interest[1], ":")
+            data_interest.sort(key=custom_sort, reverse=True)
+            for data in data_interest:
+                print("-> ", data[0], data[1], "who works at", data[2], "with level", data[4])
+    else:
+        print("-> Sorry, this user does not exist.")
+
+def sim_skills():
+    data_interest = []
+    first, last = input("Enter the first and last name of the user.\n-> ").split()
+    if userexists(first, last):
+        c.execute("SELECT * FROM user WHERE first=%s AND last=%s", (first, last))
+        user_info = c.fetchone()
+        c.execute("SELECT * FROM skill WHERE user_id = %s", (user_info[0],))
+        commSkills = (c.fetchall())
+        for each_skill in commSkills:
+            c.execute("SELECT * FROM skill WHERE skill_name = %s", (each_skill[1],))
+            int_info = (c.fetchall())
+            for data in int_info:
+                if user_info[0] == data[0]:
+                    continue
+                c.execute("SELECT * FROM user WHERE user_id = %s", (data[0],))
+                per_info = (c.fetchone())
+                c.execute("SELECT org_name FROM organization WHERE user_id = %s", (per_info[0],))
+                comp_info = c.fetchone()
+                data_interest.append([per_info[1], per_info[2], comp_info[0], each_skill[1], data[2]])
+            print("Here is a list of other uers who share a skill in", each_skill[1], ":")
+            data_interest.sort(key=custom_sort, reverse=True)
+            for data in data_interest:
+                print("-> ", data[0], data[1], "who works at", data[2], "with level", data[4])
+    else:
+        print("-> Sorry, this user does not exist.")
+
+# def trusted_coll():
+#     first, last = input("Enter the first and last name for whom you would like to find trusted colleagues. \n ").split()
+#     if userexists(first, last):
+#         c.execute("SELECT * FROM user WHERE first=%s AND last=%s", (first, last))
+#         user_info = c.fetchone()
+#         c.execute("SELECT org_name FROM organization WHERE user_id=%s", (user_info[0],))
+#         user_org = c.fetchone()
+#         c.execute("SELECT user_id FROM organization WHERE org_name=%s", (user_org[0],))
+#         coworkers = c.fetchall()
+#         for each coworker in coworkers:
+#             c.execute("SELECT ")
+#
+#     else:
+#         print("-> Sorry, this user does not exist.")
 
 
 user_data = csv.reader(open('user.csv'))
@@ -99,12 +126,14 @@ project_data = csv.reader(open('project.csv'))
 interest_data = csv.reader(open('interest.csv'))
 org_data = csv.reader(open('organization.csv'))
 skill_data = csv.reader(open('skill.csv'))
+dist_data = csv.reader(open('distance.csv'))
 
 firstline = True
 firstline2 = True
 firstline3 = True
 firstline4 = True
 firstline5 = True
+firstline6 = True
 
 for row in user_data:
     if firstline:
@@ -115,7 +144,6 @@ for row in user_data:
                 first, last )' \
                 'VALUES(%s, %s, %s)',
                 row)
-        print(row)
 
 for row in project_data:
     if firstline2:
@@ -126,7 +154,6 @@ for row in project_data:
                 proj_name)' \
                 'VALUES(%s, %s)',
                 row)
-        print(row)
 
 for row in interest_data:
     if firstline3:
@@ -134,7 +161,6 @@ for row in interest_data:
         continue
     else:
         c.execute('INSERT INTO interest(user_id, interest, interest_level) VALUES(%s, %s, %s)', row)
-        print(row)
 
 for row in org_data:
     if firstline4:
@@ -142,7 +168,6 @@ for row in org_data:
         continue
     else:
         c.execute('INSERT INTO organization(user_id, org_name, org_type) VALUES(%s, %s, %s)', row)
-        print(row)
 
 for row in skill_data:
     if firstline5:
@@ -150,14 +175,22 @@ for row in skill_data:
         continue
     else:
         c.execute('INSERT INTO skill(user_id, skill_name, skill_level) VALUES(%s, %s, %s)', row)
-        print(row)
 
+for row in dist_data:
+    if firstline6:
+        firstline6 = False
+        continue
+    else:
+        c.execute('INSERT INTO distance(org1, org2, distance) VALUES(%s, %s, %s)', row)
 
 print("Welcome to the Collaborator Software. The CSV files have been read! Here are the following inputs:")
 while True:
     key = input(""" 
 Press 1 to find information about a specific user. 
 Press 2 to find collaborators to a user. 
+Press 3 to find a user with similar interests.
+Press 4 to find a user with a common skill.
+Press 5 to find a trusted colleague. 
 Press 0 to exit \n-> """)
     if key == '1':
         cur = conn.cursor()
@@ -196,7 +229,7 @@ Press 0 to exit \n-> """)
                 for row2 in rows2:
                     ids.append(row2[0])
                 query3 = "SELECT * FROM user WHERE user_id=%s"
-                print("-> Here is a list of trusted colleague(s) for project ", row[4], ":")
+                print("-> Here is a list of trusted colleague(s) for project", row[4], ":")
                 for x in range(len(ids)):
                     cur.execute(query3, (ids[x],))
                     rows3 = cur.fetchall()
@@ -207,13 +240,13 @@ Press 0 to exit \n-> """)
                             print("-> ", row3[1], row3[2])
         else:
             print("-> Sorry this user does not exist.")
+    elif key == '3':
+        sim_interests()
+    elif key == '4':
+        sim_skills()
     elif key == '0':
         print("Thank you for using our software")
         break
-    elif key == '3':
-        simInterests()
-    elif key == '4':
-        simSkills()
     else:
         print("This input was not recognized.")
 
