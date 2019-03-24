@@ -1,6 +1,7 @@
 import csv
 import mysql.connector
 
+
 conn = mysql.connector.connect(host="localhost", user="root", passwd="password", database="collaboratordb")
 
 c = conn.cursor(buffered=True)
@@ -192,20 +193,9 @@ def collaborators():
         print("This input is valid.")
 
 
-user_data = csv.reader(open('user.csv'))
-project_data = csv.reader(open('project.csv'))
-interest_data = csv.reader(open('interest.csv'))
-org_data = csv.reader(open('organization.csv'))
-skill_data = csv.reader(open('skill.csv'))
-dist_data = csv.reader(open('distance.csv'))
-
+file1 = input("-> Enter the user csv file to be read: ")
+user_data = csv.reader(open(file1))
 firstline = True
-firstline2 = True
-firstline3 = True
-firstline4 = True
-firstline5 = True
-firstline6 = True
-
 for row in user_data:
     if firstline:
         firstline = False
@@ -213,6 +203,9 @@ for row in user_data:
     else:
         c.execute('INSERT INTO user(user_id,first, last ) VALUES(%s, %s, %s)', row)
 
+file2 = input("-> Enter the project csv file to be read: ")
+project_data = csv.reader(open(file2))
+firstline2 = True
 for row in project_data:
     if firstline2:
         firstline2 = False
@@ -220,6 +213,9 @@ for row in project_data:
     else:
         c.execute('INSERT INTO project(user_id, proj_name) VALUES(%s, %s)', row)
 
+file3 = input("-> Enter the interest csv file to be read: ")
+interest_data = csv.reader(open(file3))
+firstline3 = True
 for row in interest_data:
     if firstline3:
         firstline3 = False
@@ -227,6 +223,9 @@ for row in interest_data:
     else:
         c.execute('INSERT INTO interest(user_id, interest, interest_level) VALUES(%s, %s, %s)', row)
 
+file4 = input("-> Enter the organization csv file to be read: ")
+org_data = csv.reader(open(file4))
+firstline4 = True
 for row in org_data:
     if firstline4:
         firstline4 = False
@@ -234,6 +233,9 @@ for row in org_data:
     else:
         c.execute('INSERT INTO organization(user_id, org_name, org_type) VALUES(%s, %s, %s)', row)
 
+file5 = input("-> Enter the skill csv file to be read: ")
+skill_data = csv.reader(open(file5))
+firstline5 = True
 for row in skill_data:
     if firstline5:
         firstline5 = False
@@ -241,12 +243,16 @@ for row in skill_data:
     else:
         c.execute('INSERT INTO skill(user_id, skill_name, skill_level) VALUES(%s, %s, %s)', row)
 
+file6 = input("-> Enter the distance csv file to be read: ")
+dist_data = csv.reader(open(file6))
+firstline6 = True
 for row in dist_data:
     if firstline6:
         firstline6 = False
         continue
     else:
         c.execute('INSERT INTO distance(org1, org2, distance) VALUES(%s, %s, %s)', row)
+
 
 print("Welcome to the Collaborator Software. The CSV files have been read! Here are the following inputs:")
 while True:
