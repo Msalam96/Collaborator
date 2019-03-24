@@ -144,7 +144,6 @@ for row in org_data:
         c.execute('INSERT INTO organization(user_id, org_name, org_type) VALUES(%s, %s, %s)', row)
         print(row)
 
-<<<<<<< HEAD
 for row in skill_data:
     if firstline5:
         firstline5 = False
