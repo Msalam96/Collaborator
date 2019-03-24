@@ -45,8 +45,6 @@ c.execute("""CREATE TABLE IF NOT EXISTS skill (
         skill_level integer
         )""")
 
-
-<<<<<<< HEAD
 def simInterests():
     first, last = input("Enter the first and last name of the user.\n-> ").split()
     if userexists(first, last):
