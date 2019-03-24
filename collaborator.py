@@ -55,9 +55,8 @@ def userexists(f, l):
 def custom_sort(t):
     return t[4]
 
-
 def sim_interests():
-    data_interest = []
+    mdata_interest = []
     first, last = input("Enter the first and last name of the user.\n-> ").split()
     if userexists(first, last):
         c.execute("SELECT * FROM user WHERE first=%s AND last=%s", (first, last))
@@ -65,6 +64,7 @@ def sim_interests():
         c.execute("SELECT * FROM interest WHERE user_id = %s", (user_info[0],))
         comm_interests = (c.fetchall())
         for s_interest in comm_interests:
+            data_interest = []
             c.execute("SELECT * FROM interest WHERE interest = %s", (s_interest[1],))
             int_info = (c.fetchall())
             for data in int_info:
@@ -75,12 +75,38 @@ def sim_interests():
                 c.execute("SELECT org_name FROM organization WHERE user_id = %s", (per_info[0],))
                 comp_info = c.fetchone()
                 data_interest.append([per_info[1], per_info[2], comp_info[0], s_interest[1], data[2]])
-            print("Here is a list of other users who share an interest in", s_interest[1], ":")
-            data_interest.sort(key=custom_sort, reverse=True)
-            for data in data_interest:
-                print("-> ", data[0], data[1], "who works at", data[2], "with level", data[4])
+            if not data_interest:
+                continue
+            else:
+                print("Here is a list of other users who share an interest in", s_interest[1], ":")
+                data_interest.sort(key=custom_sort, reverse=True)
+                for data in data_interest:
+                    print("-> ", data[0], data[1], "who works at", data[2], "with level", data[4])
+                    mdata_interest.append(data)
     else:
         print("-> Sorry, this user does not exist.")
+
+    # result = {}
+    # print("\nInfo in mdata_interest: ")
+    # for info in mdata_interest:
+    #     if info[1]
+    #
+    # for i in range (1,len(mdata_interest)):
+    #     for info in mdata_interest:
+    #         if info[0] == info[i]:
+    #             print("this works")
+    # for info in mdata_interest:
+    #     key = info[0] + info[1]
+    #     total = result.get(key,0) + info[4]
+    #     result[info[0], info[1], info[2], info[3]] = total
+    #
+    # print("Here is the result dict: ", result)
+    #
+    # interests = collections.defaultdict(int)
+    # for data in mdata_interest:
+    #     first, last, org, interest, level = data
+    #     interests[(first,last,org,interest)] += level
+    # print("\ndict(result) = ", dict(interests))
 
 
 def sim_skills():
@@ -99,15 +125,34 @@ def sim_skills():
                     continue
                 c.execute("SELECT * FROM user WHERE user_id = %s", (data[0],))
                 per_info = (c.fetchone())
-                c.execute("SELECT org_name FROM organization WHERE user_id = %s", (per_info[0],))
+                c.execute("SELECT org_name,org_type FROM organization WHERE user_id = %s", (per_info[0],))
                 comp_info = c.fetchone()
-                data_interest.append([per_info[1], per_info[2], comp_info[0], each_skill[1], data[2]])
-            print("Here is a list of other uers who share a skill in", each_skill[1], ":")
-            data_interest.sort(key=custom_sort, reverse=True)
-            for data in data_interest:
-                print("-> ", data[0], data[1], "who works at", data[2], "with level", data[4])
+                data_interest.append([per_info[1], per_info[2], comp_info[0], each_skill[1], data[2], comp_info[1]])
+            if not data_interest:
+                continue
+            else:
+                print("Here is a list of other users who share a skill in", each_skill[1], ":")
+                data_interest.sort(key=custom_sort, reverse=True)
+                for data in data_interest:
+                    print("-> ", data[0], data[1], "who works at", data[2], "with level", data[4])
     else:
         print("-> Sorry, this user does not exist.")
+
+
+# def trusted_coll():
+#     first, last = input("Enter the first and last name for whom you would like to find trusted colleagues. \n ").split()
+#     if userexists(first, last):
+#         c.execute("SELECT * FROM user WHERE first=%s AND last=%s", (first, last))
+#         user_info = c.fetchone()
+#         c.execute("SELECT org_name FROM organization WHERE user_id=%s", (user_info[0],))
+#         user_org = c.fetchone()
+#         c.execute("SELECT user_id FROM organization WHERE org_name=%s", (user_org[0],))
+#         coworkers = c.fetchall()
+#         for each coworker in coworkers:
+#             c.execute("SELECT ")
+#
+#     else:
+#         print("-> Sorry, this user does not exist.")
 
 
 def details():
@@ -261,7 +306,6 @@ Press 1 to find information about a specific user.
 Press 2 to find collaborators to a user. 
 Press 3 to find a user with similar interests.
 Press 4 to find a user with a common skill.
-Press 5 to find a trusted colleague. 
 Press 0 to exit \n-> """))
     if key == 1:
         details()
