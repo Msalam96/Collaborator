@@ -46,6 +46,7 @@ c.execute("""CREATE TABLE IF NOT EXISTS skill (
         )""")
 
 
+<<<<<<< HEAD
 def simInterests():
     first, last = input("Enter the first and last name of the user.\n-> ").split()
     if userexists(first, last):
@@ -145,6 +146,7 @@ for row in org_data:
         c.execute('INSERT INTO organization(user_id, org_name, org_type) VALUES(%s, %s, %s)', row)
         print(row)
 
+<<<<<<< HEAD
 for row in skill_data:
     if firstline5:
         firstline5 = False
@@ -152,6 +154,7 @@ for row in skill_data:
     else:
         c.execute('INSERT INTO skill(user_id, skill_name, skill_level) VALUES(%s, %s, %s)', row)
         print(row)
+
 
 print("Welcome to the Collaborator Software. The CSV files have been read! Here are the following inputs:")
 while True:
