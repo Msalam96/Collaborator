@@ -74,7 +74,7 @@ def simSkills():
         c.execute("SELECT * FROM skill WHERE user_id = %s", (userInfo[0],))
         commSkills = (c.fetchall())
         for eachSkill in commSkills:
-            c.execute("SELECT * FROM skill WHERE skill = %s", (eachSkill[1],))
+            c.execute("SELECT * FROM skill WHERE skill_name = %s", (eachSkill[1],))
             intInfo = (c.fetchall())
             for data in intInfo:
                 if userInfo[0] == data[0]:
