@@ -61,6 +61,8 @@ def sim_interests():
     if userexists(first, last):
         c.execute("SELECT * FROM user WHERE first=%s AND last=%s", (first, last))
         user_info = c.fetchone()
+        c.execute("SELECT org_name FROM organization WHERE user_id = %s", (user_info[0],))
+        first_location = c.fetchone()
         c.execute("SELECT * FROM interest WHERE user_id = %s", (user_info[0],))
         comm_interests = (c.fetchall())
         for s_interest in comm_interests:
@@ -74,14 +76,17 @@ def sim_interests():
                 per_info = (c.fetchone())
                 c.execute("SELECT org_name FROM organization WHERE user_id = %s", (per_info[0],))
                 comp_info = c.fetchone()
-                data_interest.append([per_info[1], per_info[2], comp_info[0], s_interest[1], data[2]])
+                c.execute("SELECT distance FROM distance WHERE org1=%s AND org2=%s", (first_location[0], comp_info[0]))
+                dist_info = c.fetchone()
+                print("DISTANCE INFO: ", dist_info)
+                data_interest.append([per_info[1], per_info[2], comp_info[0], s_interest[1], data[2], dist_info])
             if not data_interest:
                 continue
             else:
                 print("Here is a list of other users who share an interest in", s_interest[1], ":")
                 data_interest.sort(key=custom_sort, reverse=True)
                 for data in data_interest:
-                    print("-> ", data[0], data[1], "who works at", data[2], "with level", data[4])
+                    print("-> ", data[0], data[1], "who works at", data[2], "with level", data[4], "distance", data[5])
                     mdata_interest.append(data)
     else:
         print("-> Sorry, this user does not exist.")
@@ -115,6 +120,8 @@ def sim_skills():
     if userexists(first, last):
         c.execute("SELECT * FROM user WHERE first=%s AND last=%s", (first, last))
         user_info = c.fetchone()
+        c.execute("SELECT org_name FROM organization WHERE user_id = %s", (user_info[0],))
+        first_location = c.fetchone()
         c.execute("SELECT * FROM skill WHERE user_id = %s", (user_info[0],))
         commSkills = (c.fetchall())
         for each_skill in commSkills:
@@ -127,6 +134,8 @@ def sim_skills():
                 per_info = (c.fetchone())
                 c.execute("SELECT org_name,org_type FROM organization WHERE user_id = %s", (per_info[0],))
                 comp_info = c.fetchone()
+                c.execute("SELECT distance FROM distance WHERE org1=%s AND org2=%s", (first_location[0], comp_info[0]))
+                dist_info = c.fetchone()
                 data_interest.append([per_info[1], per_info[2], comp_info[0], each_skill[1], data[2], comp_info[1]])
             if not data_interest:
                 continue
