@@ -79,21 +79,25 @@ def sim_skills():
                 comp_info = c.fetchone()
                 c.execute("SELECT distance FROM distance WHERE org1=%s AND org2=%s", (first_location[0], comp_info[0]))
                 dist_info = c.fetchone()
-                data_interest.append([per_info[1], per_info[2], comp_info[0], each_skill[1], data[2], comp_info[1], dist_info[0]])
-                if not data_interest:
-                    continue
+                count = c.rowcount
+                if count == 0:
+                    print("-> There is no user that fits this description.")
                 else:
-                    if float(dist_info[0]) > 10:
+                    data_interest.append([per_info[1], per_info[2], comp_info[0], each_skill[1], data[2], comp_info[1], dist_info[0]])
+                    if not data_interest:
                         continue
                     else:
-                        print("\nHere is a list of other users who share a skill in", each_skill[1], ":")
-                        if float(dist_info[0]) == 0:
-                            print("-> ", data[0], data[1], "works with you", data[2], "with level", data[4])
+                        if float(dist_info[0]) > 10:
+                            continue
                         else:
-                            data_interest.sort(key=custom_sort, reverse=True)
-                            for data in data_interest:
-                                print("-> ", data[0], data[1], "who works at", data[2], "with a level of", data[4],
-                                      data[5], "miles from you. ")
+                            print("\nHere is a list of other users who share a skill in", each_skill[1], ":")
+                            if float(dist_info[0]) == 0:
+                                print("-> ", data[0], data[1], "works with you", data[2], "with level", data[4])
+                            else:
+                                data_interest.sort(key=custom_sort, reverse=True)
+                                for data in data_interest:
+                                    print("-> ", data[0], data[1], "who works at", data[2], "with a level of", data[4],
+                                          data[6], "miles from you. ")
     else:
         print("-> Sorry, this user does not exist.")
 
@@ -144,23 +148,27 @@ def sim_interests():
                 comp_info = c.fetchone()
                 c.execute("SELECT distance FROM distance WHERE org1=%s AND org2=%s", (first_location[0], comp_info[0]))
                 dist_info = c.fetchone()
-                data_interest.append([per_info[1], per_info[2], comp_info[0], s_interest[1], data[2], dist_info[0]])
-            if not data_interest:
-                continue
-            else:
-                data_interest.sort(key=custom_sort, reverse=True)
-                for data in data_interest:
-                    if float(data[5]) > 10:
+                count = c.rowcount
+                if count == 0:
+                    print("-> There is no user that matches your description.")
+                else:
+                    data_interest.append([per_info[1], per_info[2], comp_info[0], s_interest[1], data[2], dist_info[0]])
+                    if not data_interest:
                         continue
                     else:
-                        print("\nHere is a list of other users who share an interest in", s_interest[1], ":")
-                        if float(data[5] == 0):
-                            print("-> ", data[0], data[1], "who works with you at", data[2], "and has an interest "
-                                                                                             "level of", data[4],)
-                        else:
-                            print("-> ", data[0], data[1], "who works at", data[2], "has an interest level of", data[4],
-                                  "and works", data[5], "miles from you")
-                        mdata_interest.append(data)
+                        data_interest.sort(key=custom_sort, reverse=True)
+                        for data in data_interest:
+                            if float(data[5]) > 10:
+                                continue
+                            else:
+                                print("\nHere is a list of other users who share an interest in", s_interest[1], ":")
+                                if float(data[5] == 0):
+                                    print("-> ", data[0], data[1], "who works with you at", data[2], "and has an interest "
+                                                                                                     "level of", data[4],)
+                                else:
+                                    print("-> ", data[0], data[1], "who works at", data[2], "has an interest level of", data[4],
+                                          "and works", data[5], "miles from you")
+                                mdata_interest.append(data)
     else:
         print("-> Sorry, this user does not exist.")
 
@@ -253,8 +261,6 @@ def collaborators():
                     for row3 in rows3:
                         if idv == row3[0]:
                             pass
-                        elif count == 0:
-                            print("-> No Collaborators")
                         else:
                             print("->", row3[1], row3[2])
         else:
