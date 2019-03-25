@@ -81,7 +81,16 @@ def sim_skills():
                 dist_info = c.fetchone()
                 count = c.rowcount
                 if count == 0:
-                    print("-> There is no user that fits this description.")
+                    print("-> \nThere is no user within 10 miles of your organization that shares the same skillset.")
+                    data_interest.append(
+                        [per_info[1], per_info[2], comp_info[0], each_skill[1], data[2], comp_info[1]])
+                    if not data_interest:
+                        continue
+                    else:
+                        print("\nHere is a list of other users who share a skill in", each_skill[1], ":")
+                        data_interest.sort(key=custom_sort, reverse=True)
+                        for data in data_interest:
+                            print("-> ", data[0], data[1], "who works at", data[2], "with a level of", data[4])
                 else:
                     data_interest.append([per_info[1], per_info[2], comp_info[0], each_skill[1], data[2], comp_info[1], dist_info[0]])
                     if not data_interest:
@@ -150,7 +159,17 @@ def sim_interests():
                 dist_info = c.fetchone()
                 count = c.rowcount
                 if count == 0:
-                    print("-> There is no user that matches your description.")
+                    print("-> \nThere is no user within 10 miles of your organization that shares the same interests.")
+                    data_interest.append([per_info[1], per_info[2], comp_info[0], s_interest[1], data[2]])
+                    if not data_interest:
+                        continue
+                    else:
+                        data_interest.sort(key=custom_sort, reverse=True)
+                        for data in data_interest:
+                            print("\nHere is a list of other users who share an interest in", s_interest[1], ":")
+                            print("-> ", data[0], data[1], "who works at", data[2], "has an interest level of",
+                                  data[4])
+                            mdata_interest.append(data)
                 else:
                     data_interest.append([per_info[1], per_info[2], comp_info[0], s_interest[1], data[2], dist_info[0]])
                     if not data_interest:
