@@ -78,7 +78,7 @@ def sim_skills():
                 comp_info = c.fetchone()
                 c.execute("SELECT distance FROM distance WHERE org1=%s AND org2=%s", (first_location[0], comp_info[0]))
                 dist_info = c.fetchone()
-                print(dist_info[0])
+                #print(dist_info[0])
                 data_interest.append([per_info[1], per_info[2], comp_info[0], each_skill[1], data[2], comp_info[1], dist_info[0]])
                 if not data_interest:
                     continue
@@ -89,7 +89,7 @@ def sim_skills():
                         print("Here is a list of other users who share a skill in", each_skill[1], ":")
                         data_interest.sort(key=custom_sort, reverse=True)
                         for data in data_interest:
-                            print("-> ", data[0], data[1], "who works at", data[2], "with level", data[4])
+                            print("-> ", data[0], data[1], "who works at", data[2],"that is",dist_info[0],"miles from you with a skill level of", data[4])
     else:
         print("-> Sorry, this user does not exist.")
 
