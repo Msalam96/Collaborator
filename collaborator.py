@@ -61,8 +61,6 @@ def sim_interests():
     if userexists(first, last):
         c.execute("SELECT * FROM user WHERE first=%s AND last=%s", (first, last))
         user_info = c.fetchone()
-        c.execute("SELECT org_name FROM organization WHERE user_id = %s", (user_info[0],))
-        first_location = c.fetchone()
         c.execute("SELECT * FROM interest WHERE user_id = %s", (user_info[0],))
         comm_interests = (c.fetchall())
         for s_interest in comm_interests:
@@ -76,17 +74,14 @@ def sim_interests():
                 per_info = (c.fetchone())
                 c.execute("SELECT org_name FROM organization WHERE user_id = %s", (per_info[0],))
                 comp_info = c.fetchone()
-                c.execute("SELECT distance FROM distance WHERE org1=%s AND org2=%s", (first_location[0], comp_info[0]))
-                dist_info = c.fetchone()
-                print("DISTANCE INFO: ", dist_info)
-                data_interest.append([per_info[1], per_info[2], comp_info[0], s_interest[1], data[2], dist_info])
+                data_interest.append([per_info[1], per_info[2], comp_info[0], s_interest[1], data[2]])
             if not data_interest:
                 continue
             else:
                 print("Here is a list of other users who share an interest in", s_interest[1], ":")
                 data_interest.sort(key=custom_sort, reverse=True)
                 for data in data_interest:
-                    print("-> ", data[0], data[1], "who works at", data[2], "with level", data[4], "distance", data[5])
+                    print("-> ", data[0], data[1], "who works at", data[2], "with level", data[4])
                     mdata_interest.append(data)
     else:
         print("-> Sorry, this user does not exist.")
@@ -114,36 +109,42 @@ def sim_interests():
     # print("\ndict(result) = ", dict(interests))
 
 
-def sim_skills():
-    data_interest = []
+def sim_interests():
+    mdata_interest = []
     first, last = input("Enter the first and last name of the user.\n-> ").split()
     if userexists(first, last):
         c.execute("SELECT * FROM user WHERE first=%s AND last=%s", (first, last))
         user_info = c.fetchone()
         c.execute("SELECT org_name FROM organization WHERE user_id = %s", (user_info[0],))
         first_location = c.fetchone()
-        c.execute("SELECT * FROM skill WHERE user_id = %s", (user_info[0],))
-        commSkills = (c.fetchall())
-        for each_skill in commSkills:
-            c.execute("SELECT * FROM skill WHERE skill_name = %s", (each_skill[1],))
+        c.execute("SELECT * FROM interest WHERE user_id = %s", (user_info[0],))
+        comm_interests = (c.fetchall())
+        for s_interest in comm_interests:
+            data_interest = []
+            c.execute("SELECT * FROM interest WHERE interest = %s", (s_interest[1],))
             int_info = (c.fetchall())
             for data in int_info:
                 if user_info[0] == data[0]:
                     continue
                 c.execute("SELECT * FROM user WHERE user_id = %s", (data[0],))
                 per_info = (c.fetchone())
-                c.execute("SELECT org_name,org_type FROM organization WHERE user_id = %s", (per_info[0],))
+                c.execute("SELECT org_name FROM organization WHERE user_id = %s", (per_info[0],))
                 comp_info = c.fetchone()
                 c.execute("SELECT distance FROM distance WHERE org1=%s AND org2=%s", (first_location[0], comp_info[0]))
                 dist_info = c.fetchone()
-                data_interest.append([per_info[1], per_info[2], comp_info[0], each_skill[1], data[2], comp_info[1]])
+                print("DISTANCE INFO: ", dist_info[0])
+                data_interest.append([per_info[1], per_info[2], comp_info[0], s_interest[1], data[2], dist_info[0]])
             if not data_interest:
                 continue
             else:
-                print("Here is a list of other users who share a skill in", each_skill[1], ":")
+                print("Here is a list of other users who share an interest in", s_interest[1], ":")
                 data_interest.sort(key=custom_sort, reverse=True)
                 for data in data_interest:
-                    print("-> ", data[0], data[1], "who works at", data[2], "with level", data[4])
+                    if data[5] > 10:
+                        pass
+                    else:
+                        print("-> ", data[0], data[1], "who works at", data[2], "with level", data[4], "distance", data[5])
+                        mdata_interest.append(data)
     else:
         print("-> Sorry, this user does not exist.")
 
@@ -173,21 +174,21 @@ def details():
             userset = (cur.fetchone())
             uid = userset[0]
             #print('-> The users id is: ', userset[0])
-            print('-> The users first name is: ', userset[1])
-            print('-> The users last name is: ', userset[2])
+            print('-> The users first name is:', userset[1])
+            print('-> The users last name is:', userset[2])
             # print('-> The users phone number is: ', userset[3])
             # print('-> The users address is: ', userset[4])
             # print('-> The user has a degree in: ', userset[5])
             query = "SELECT * FROM project WHERE user_id=%s"
             cur.execute(query, (uid,))
             userset2 = cur.fetchall()
-            print("-> Projects this user has worked on are: ")
+            print("-> Projects this user has worked on are:")
             for row in userset2:
                 print("-> ", row[1])
             query2 = "SELECT * FROM interest WHERE user_id=%s"
             cur.execute(query2, (uid,))
             userset3 = cur.fetchall()
-            print("-> Interests this user has are: ")
+            print("-> Interests this user has are:")
             for row2 in userset3:
                 print("-> ", row2[1])
             query3 = "SELECT * FROM skill WHERE user_id=%s"
@@ -199,7 +200,7 @@ def details():
             query4 = "SELECT * FROM organization WHERE user_id=%s"
             cur.execute(query4, (uid,))
             userset5 = cur.fetchone()
-            print("-> This user's organization is: ", userset5[1])
+            print("-> This user's organization is:", userset5[1])
         else:
             print("-> Sorry, this user does not exist.")
     except ValueError:
@@ -240,9 +241,30 @@ def collaborators():
                         elif count == 0:
                             print("-> No Collaborators")
                         else:
-                            print("-> ", row3[1], row3[2])
+                            print("->", row3[1], row3[2])
         else:
             print("-> Sorry this user does not exist.")
+    except ValueError:
+        print("This input is invalid.")
+
+
+def distances():
+    cur = conn.cursor()
+    try:
+        first, last = input("Enter the first and last name of the user to find nearby organizations.\n-> ").split()
+        if userexists(first, last):
+            cur.execute("SELECT * FROM user WHERE first=%s AND last=%s", (first, last))
+            userset = (cur.fetchone())
+            uid = userset[0]
+            query = "SELECT * FROM organization WHERE user_id=%s"
+            cur.execute(query,(uid,))
+            rows = cur.fetchone()
+            org = rows[1]
+            query2 = "SELECT * FROM distance WHERE org1=%s AND distance < 10"
+            cur.execute(query2,(org,))
+            rows2 = cur.fetchall()
+            for row in rows2:
+                print("->", row[1], "is", row[2], "miles from", row[0], ".")
     except ValueError:
         print("This input is valid.")
 
@@ -255,7 +277,7 @@ for row in user_data:
         firstline = False
         continue
     else:
-        c.execute('INSERT INTO user(user_id,first, last ) VALUES(%s, %s, %s)', row)
+        c.execute('INSERT IGNORE INTO user(user_id,first, last ) VALUES(%s, %s, %s)', row)
 
 file2 = input("-> Enter the project csv file to be read: ")
 project_data = csv.reader(open(file2))
@@ -265,7 +287,7 @@ for row in project_data:
         firstline2 = False
         continue
     else:
-        c.execute('INSERT INTO project(user_id, proj_name) VALUES(%s, %s)', row)
+        c.execute('INSERT IGNORE INTO project(user_id, proj_name) VALUES(%s, %s)', row)
 
 file3 = input("-> Enter the interest csv file to be read: ")
 interest_data = csv.reader(open(file3))
@@ -275,7 +297,7 @@ for row in interest_data:
         firstline3 = False
         continue
     else:
-        c.execute('INSERT INTO interest(user_id, interest, interest_level) VALUES(%s, %s, %s)', row)
+        c.execute('INSERT IGNORE INTO interest(user_id, interest, interest_level) VALUES(%s, %s, %s)', row)
 
 file4 = input("-> Enter the organization csv file to be read: ")
 org_data = csv.reader(open(file4))
@@ -285,7 +307,7 @@ for row in org_data:
         firstline4 = False
         continue
     else:
-        c.execute('INSERT INTO organization(user_id, org_name, org_type) VALUES(%s, %s, %s)', row)
+        c.execute('INSERT IGNORE INTO organization(user_id, org_name, org_type) VALUES(%s, %s, %s)', row)
 
 file5 = input("-> Enter the skill csv file to be read: ")
 skill_data = csv.reader(open(file5))
@@ -295,7 +317,7 @@ for row in skill_data:
         firstline5 = False
         continue
     else:
-        c.execute('INSERT INTO skill(user_id, skill_name, skill_level) VALUES(%s, %s, %s)', row)
+        c.execute('INSERT IGNORE INTO skill(user_id, skill_name, skill_level) VALUES(%s, %s, %s)', row)
 
 file6 = input("-> Enter the distance csv file to be read: ")
 dist_data = csv.reader(open(file6))
@@ -305,28 +327,29 @@ for row in dist_data:
         firstline6 = False
         continue
     else:
-        c.execute('INSERT INTO distance(org1, org2, distance) VALUES(%s, %s, %s)', row)
-
+        c.execute('INSERT IGNORE INTO distance(org1, org2, distance) VALUES(%s, %s, %s)', row)
 
 print("Welcome to the Collaborator Software. The CSV files have been read! Here are the following inputs:")
 while True:
-    key = int(input(""" 
+    key = input(""" 
 Press 1 to find information about a specific user. 
 Press 2 to find collaborators to a user. 
 Press 3 to find a user with similar interests.
 Press 4 to find a user with a common skill.
-Press 0 to exit \n-> """))
-    if key == 1:
+Press 5 to find organizations within 10 miles from a user.
+Press 0 to exit \n-> """)
+    if key == '1':
         details()
-    elif key == 2:
+    elif key == '2':
         collaborators()
-    elif key == 3:
+    elif key == '3':
         sim_interests()
-    elif key == 4:
+    elif key == '4':
         sim_skills()
-    elif key == 0:
+    elif key == '5':
+        distances()
+    elif key == '0':
         print("Thank you for using our software")
         break
     else:
         print("This input was not recognized.")
-
